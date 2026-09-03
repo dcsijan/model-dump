@@ -1,8 +1,12 @@
 import ctypes, ctypes.util, os, sys, subprocess
 
-espresso_path = ctypes.util.find_library("Espresso")
+espresso_path = "/System/Library/PrivateFrameworks/Espresso.framework/Espresso"
+if not os.path.exists(espresso_path):
+    espresso_path = ctypes.util.find_library("Espresso")
 if not espresso_path:
-    for p in ["/System/Library/PrivateFrameworks/Espresso.framework/Espresso"]:
+    # search more locations
+    for p in ["/usr/lib/Espresso.framework/Espresso",
+              "/System/Library/Frameworks/Espresso.framework/Espresso"]:
         if os.path.exists(p):
             espresso_path = p
             break
