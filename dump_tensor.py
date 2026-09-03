@@ -13,7 +13,7 @@ os.system("pip install coremltools numpy --quiet")
 import coremltools as ct
 import numpy as np
 
-BUNDLE = "cr_tr_model_latincyrillic_v3.mlmodelc.bundle"
+BUNDLE = "."  # files are in the repo root
 
 # Check what we have
 print("Files in bundle:")
