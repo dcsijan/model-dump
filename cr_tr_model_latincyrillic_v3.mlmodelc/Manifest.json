@@ -1,0 +1,17 @@
+{
+  "itemInfoEntries": {
+    "model.espresso.net": {
+      "path": "model.espresso.net"
+    },
+    "model.espresso.weights": {
+      "path": "model.espresso.weights"
+    },
+    "model.espresso.shape": {
+      "path": "model.espresso.shape"
+    },
+    "model.output.shape": {
+      "path": "model.output.shape"
+    }
+  },
+  "rootModelIdentifier": "model.espresso.net"
+}
