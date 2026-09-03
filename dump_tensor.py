@@ -1,41 +1,44 @@
+import ctypes, ctypes.util, os, sys, subprocess
 
-import ctypes
-import ctypes.util
-import json
-import os
-import sys
-import numpy as np
-
-# Load the Espresso framework
 espresso_path = ctypes.util.find_library("Espresso")
-if espresso_path is None:
-    # Try known paths
-    for p in ["/System/Library/PrivateFrameworks/Espresso.framework/Espresso",
-              "/System/Library/PrivateFrameworks/Espresso.framework/Versions/A/Espresso"]:
+if not espresso_path:
+    for p in ["/System/Library/PrivateFrameworks/Espresso.framework/Espresso"]:
         if os.path.exists(p):
             espresso_path = p
             break
 
-print("Espresso library:", espresso_path)
-if espresso_path is None:
-    print("Espresso framework not found!")
+print("Espresso:", espresso_path)
+if not espresso_path:
     sys.exit(1)
 
-esp = ctypes.CDLL(espresso_path)
-
-# Also load CoreML (which uses Espresso internally)
-coreml_path = ctypes.util.find_library("CoreML")
-print("CoreML library:", coreml_path)
-
-# The Espresso framework has C functions for loading models.
-# Let me find the right function names by looking at the symbols:
-import subprocess
 result = subprocess.run(["nm", "-gU", espresso_path], capture_output=True, text=True)
-symbols = result.stdout
-# Look for functions with "load" and "network" in the name
-for line in symbols.split("
-"):
-    if ("load" in line.lower() or "create" in line.lower()) and "network" in line.lower():
-        print(line)
-    if "espresso" in line.lower() and "create" in line.lower():
-        print(line)
+lines = result.stdout.splitlines()
+print("Total exported symbols:", len(lines))
+
+interesting = []
+for line in lines:
+    low = line.lower()
+    if ("load" in low or "create" in low or "open" in low) and ("net" in low or "model" in low or "plan" in low or "graph" in low):
+        interesting.append(line)
+
+print("\nNetwork/Model loading functions:")
+for line in sorted(interesting)[:40]:
+    print(" ", line)
+
+print("\nRNN-related:")
+for line in lines:
+    if "generic_rnn" in line or "rnn_arch" in line:
+        print(" ", line)
+
+print("\nSerDes-related:")
+for line in lines:
+    if "SerDes" in line or "serdes" in line:
+        print(" ", line)
+
+print("\nC-compatible load/init/create functions:")
+for line in lines:
+    parts = line.split()
+    if len(parts) >= 3:
+        name = parts[-1]
+        if ("espresso" in name.lower() or "e5rt" in name.lower()) and ("load" in name.lower() or "init" in name.lower() or "create" in name.lower()):
+            print(" ", name)
