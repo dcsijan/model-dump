@@ -1,0 +1,30 @@
+name: Dump CoreML Tensors
+
+on: [push, workflow_dispatch]
+
+jobs:
+  dump:
+    runs-on: macos-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run tensor dump
+        run: |
+          python dump_tensor.py 2>&1 | tee output_log.txt
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: tensor_dump
+          path: |
+            output_log.txt
+            model_spec.txt
+            blob_info.json
+            output_*.npy
+          if-no-files-found: warn
