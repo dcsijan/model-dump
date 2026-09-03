@@ -1,18 +1,21 @@
 import ctypes, ctypes.util, os, sys, subprocess
 
-espresso_path = "/System/Library/PrivateFrameworks/Espresso.framework/Espresso"
-if not os.path.exists(espresso_path):
-    espresso_path = ctypes.util.find_library("Espresso")
-if not espresso_path:
-    # search more locations
-    for p in ["/usr/lib/Espresso.framework/Espresso",
-              "/System/Library/Frameworks/Espresso.framework/Espresso"]:
-        if os.path.exists(p):
-            espresso_path = p
-            break
+result = subprocess.run(["find", "/System/Library", "/usr/lib", "-name", "Espresso*", "-type", "d"], capture_output=True, text=True)
+print("Espresso search:", result.stdout)
+result2 = subprocess.run(["find", "/", "-name", "libEspresso*", "-maxdepth", "5"], capture_output=True, text=True)
+print("libEspresso search:", result2.stdout)
+# Check what private frameworks exist
+result3 = subprocess.run(["ls", "/System/Library/PrivateFrameworks/"], capture_output=True, text=True)
+pfw = [x for x in result3.stdout.splitlines() if "spresso" in x.lower()]
+print("Espresso in PrivateFrameworks:", pfw)
+result4 = subprocess.run(["ls", "/System/Library/PrivateFrameworks/Espresso.framework/"], capture_output=True, text=True)
+print("Espresso.framework contents:", result4.stdout)
 
 print("Espresso:", espresso_path)
 if not espresso_path:
+    print("NOT FOUND - dumping framework list")
+    result5 = subprocess.run(["ls", "/System/Library/PrivateFrameworks/"], capture_output=True, text=True)
+    print(result5.stdout[:2000])
     sys.exit(1)
 
 result = subprocess.run(["nm", "-gU", espresso_path], capture_output=True, text=True)
