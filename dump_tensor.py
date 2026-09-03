@@ -11,7 +11,7 @@ print("Espresso in PrivateFrameworks:", pfw)
 result4 = subprocess.run(["ls", "/System/Library/PrivateFrameworks/Espresso.framework/"], capture_output=True, text=True)
 print("Espresso.framework contents:", result4.stdout)
 
-print("Espresso:", espresso_path)
+print("Espresso:", espresso_path if "espresso_path" in dir() else "NOT SET")
 if not espresso_path:
     print("NOT FOUND - dumping framework list")
     result5 = subprocess.run(["ls", "/System/Library/PrivateFrameworks/"], capture_output=True, text=True)
